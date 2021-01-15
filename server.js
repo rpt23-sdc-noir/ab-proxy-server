@@ -3,15 +3,41 @@ const { truncate } = require('fs');
 var { createProxyMiddleware } = require('http-proxy-middleware');
 var path = require('path');
 var port = 8000;
+const cors = require('cors');
 var bodyParser = require('body-parser');
 require('dotenv').config();
-// require('newrelic');
+require('newrelic');
+const { client } = require('./redis.js');
 
 
 var app = express();
 app.use(express.static('client'))
 app.use(bodyParser.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get(`/${process.env.LOADER}/`, (req, res) => {
+  console.log('attempted to go to loader.io page');
+  res.send(process.env.LOADER);
+});
+
+
+const cache = (req, res, next) => {
+  console.log(req.path);
+  // const { id } = req.path;
+
+  // client.get(id, (err, data) => {
+  //   if (err) throw err;
+
+  //   if (data !== null) {
+  //     return res.status(200).send({
+  //       success: true,
+  //       data: JSON.parse(data),
+  //     });
+  //   }
+  //    next();
+  // });
+};
 
 
 // app.use('/songdata/', createProxyMiddleware({
@@ -40,8 +66,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // }))
 
 app.use('/comments/', createProxyMiddleware({
-  target: 'http://localhost:4000/',
-  changeOrigin: true
+  target: 'http://ec2-3-18-109-138.us-east-2.compute.amazonaws.com/',
+  changeOrigin: true,
 }))
 
 // app.use('/users/', createProxyMiddleware({
