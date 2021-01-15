@@ -3,14 +3,16 @@ const { truncate } = require('fs');
 var { createProxyMiddleware } = require('http-proxy-middleware');
 var path = require('path');
 var port = 8000;
+const cors = require('cors');
 var bodyParser = require('body-parser');
 require('dotenv').config();
-// require('newrelic');
+require('newrelic');
 
 
 var app = express();
 app.use(express.static('client'))
 app.use(bodyParser.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -40,7 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // }))
 
 app.use('/comments/', createProxyMiddleware({
-  target: 'http://localhost:4000/',
+  target: 'http://ec2-3-18-109-138.us-east-2.compute.amazonaws.com/',
   changeOrigin: true
 }))
 
